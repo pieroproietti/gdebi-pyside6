@@ -1,0 +1,4 @@
+# the source status of the package was changed from native to quilt
+# between version 0.9.5.7+nmu3 and 0.9.5.7+nmu4
+
+gdebi source: odd-historical-debian-changelog-version 0.9.5.7+nmu3 (for non-native)

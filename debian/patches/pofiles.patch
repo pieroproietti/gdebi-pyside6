@@ -1,0 +1,39 @@
+modification to avoid updating the revision date of each po file
+upon debian package build.
+Index: gdebi-0.9.5.7+nmu4/po/Makefile
+===================================================================
+--- gdebi-0.9.5.7+nmu4.orig/po/Makefile
++++ gdebi-0.9.5.7+nmu4/po/Makefile
+@@ -1,6 +1,7 @@
+ 
+ DOMAIN=gdebi
+ PO_FILES := $(wildcard *.po)
++MO_FILES := $(patsubst %.po,%.mo,$(PO_FILES))
+ CONTACT=sebastian.heinlein@web.de
+ 
+ all: update-po
+@@ -20,10 +21,13 @@ merge-po: $(PO_FILES)
+ 	mkdir -p mo/$(subst .po,,$<)/LC_MESSAGES/ 
+ 	msgfmt $< -o mo/$(subst .po,,$<)/LC_MESSAGES/$(DOMAIN).mo 
+ 
++mofiles: $(MO_FILES)
++
+ # dummy target 
+-update-po: $(DOMAIN).pot merge-po $(patsubst %.po,%.mo,$(wildcard *.po))
++update-po: $(DOMAIN).pot merge-po $(MO_FILES)
+ 	# update the po files 
+ 	#for f in $(PO_FILES); do \
+ 	#	intltool-update -r $${f%.po}  -g $(DOMAIN); \
+ 	#done
+ 
++.PHONY: all update-po mofiles merge-po
+Index: gdebi-0.9.5.7+nmu4/setup.py
+===================================================================
+--- gdebi-0.9.5.7+nmu4.orig/setup.py
++++ gdebi-0.9.5.7+nmu4/setup.py
+@@ -49,4 +49,4 @@ if 'build' in s.commands:
+               ' build/gdebi.desktop')
+     os.system('intltool-merge -d po data/gdebi-kde.desktop.in'\
+               ' build/gdebi-kde.desktop')
+-    os.system('make -C po update-po')
++    os.system('make -C po mofiles')
