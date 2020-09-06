@@ -17,7 +17,8 @@ Build-Depends: debhelper-compat (=12),
                xauth,
                lintian
 Standards-Version: 4.5.0
-Vcs-Bzr: https://code.launchpad.net/~gdebi-developers/gdebi/trunk
+Vcs-Git: https://salsa.debian.org/georgesk/gdebi.git
+Vcs-Browser: https://salsa.debian.org/georgesk/gdebi
 
 Package: gdebi-core
 Architecture: all
@@ -46,7 +47,7 @@ Depends: ${python3:Depends},
          python3-gi,
          policykit-1,
          gnome-icon-theme
-Recommends: libgtk2-perl, shared-mime-info, lintian
+Recommends: libgtk3-perl, shared-mime-info, lintian
 Description: simple tool to view and install deb files - GNOME GUI
  gdebi lets you install local deb packages resolving and installing
  its dependencies. apt does the same, but only for remote (http, ftp)

@@ -1,0 +1,463 @@
+A new man page for gdebi, to fix bug #798109
+
+--- gdebi-0.9.5.7+nmu4.orig/data/Makefile
++++ gdebi-0.9.5.7+nmu4/data/Makefile
+@@ -2,8 +2,22 @@
+ DOMAIN=gdebi
+ DESKTOP_IN_FILES := $(wildcard *.desktop.in)
+ DESKTOP_FILES := $(patsubst %.desktop.in,%.desktop,$(wildcard *.desktop.in))
++MANPAGE_SOURCES := $(wildcard *.manpage.xml)
++BUILT_MANPAGES := $(patsubst %.manpage.xml, %.1, $(MANPAGE_SOURCES))
+ 
+ all: $(DESKTOP_FILES)
+ 
++manpages: $(BUILT_MANPAGES)
++
+ %.desktop: %.desktop.in ../po/$(DOMAIN).pot
+ 	intltool-merge -d ../po $< $@
++
++%.1: %.manpage.xml
++	xsltproc --nonet \
++          --param man.charmap.use.subset "0" \
++          --param make.year.ranges "1" \
++          --param make.single.year.ranges "1" \
++          /usr/share/xml/docbook/stylesheet/docbook-xsl/manpages/docbook.xsl \
++          $<
++
++.PHONY: all manpages
+--- gdebi-0.9.5.7+nmu4.orig/data/gdebi.1
++++ gdebi-0.9.5.7+nmu4/data/gdebi.1
+@@ -1,45 +1,133 @@
+-.TH GDEBI 1 "Oce 13, 2009"
+-.SH NAME
++'\" t
++.\"     Title: GDEBI
++.\"    Author: Georges Khaznadar <georgesk@debian.org>
++.\" Generator: DocBook XSL Stylesheets v1.79.1 <http://docbook.sf.net/>
++.\"      Date: 09/06/2020
++.\"    Manual: gdebi User Manual
++.\"    Source: gdebi
++.\"  Language: English
++.\"
++.TH "GDEBI" "1" "09/06/2020" "gdebi" "gdebi User Manual"
++.\" -----------------------------------------------------------------
++.\" * Define some portability stuff
++.\" -----------------------------------------------------------------
++.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++.\" http://bugs.debian.org/507673
++.\" http://lists.gnu.org/archive/html/groff/2009-02/msg00013.html
++.\" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
++.ie \n(.g .ds Aq \(aq
++.el       .ds Aq '
++.\" -----------------------------------------------------------------
++.\" * set default formatting
++.\" -----------------------------------------------------------------
++.\" disable hyphenation
++.nh
++.\" disable justification (adjust text to left margin only)
++.ad l
++.\" -----------------------------------------------------------------
++.\" * MAIN CONTENT STARTS HERE *
++.\" -----------------------------------------------------------------
++.SH "NAME"
+ gdebi \- Simple tool to install deb files
+-.SH SYNOPSIS
+-.B gdebi
+-[\fIpackage.deb\fR]...
+-.SH DESCRIPTION
+-gdebi lets you install local deb packages resolving and installing its
+-dependencies. apt does the same, but only for remote (http, ftp) located
+-packages. It can also resolve build-depends of debian/control files.
+-.SH OPTIONS
+-.TP
++.SH "SYNOPSIS"
++.HP \w'\fBgdebi\fR\ 'u
++\fBgdebi\fR [\fB\-\-n\fR | \fB\-\-non\-interactive\fR] [{\fB\-\-o\ \fR\fB\fIAPT_OPTS\fR\fR\ |\ \fB\-\-option=\fR\fIAPT_OPTS\fR}] [\fB\-\-q\fR | \fB\-\-quiet\fR] [\fB\-\-root=\fR\fB\fIROOTDIR\fR\fR] {\fBpackage\&.deb\fR}
++.HP \w'\fBgdebi\fR\ 'u
++\fBgdebi\fR [{\fB\-h\fR\ |\ \fB\-\-help\fR} | \fB\-\-version\fR]
++.HP \w'\fBgdebi\fR\ 'u
++\fBgdebi\fR \fB\-\-apt\-line\fR {\fBpackage\&.deb\fR}
++.SH "DESCRIPTION"
++.PP
++\fBgdebi\fR
++lets you install one local deb package, resolving and installing its dependencies\&.
++.PP
++\fBapt\fR
++does the same (and also for more than one package on the command line), but only for remote (http, ftp) located packages\&.
++.PP
++\fBgdebi\fR
++can also resolve build\-depends of debian/control files\&.
++.SH "OPTIONS"
++.PP
+ \fB\-\-version\fR
+-Show program's version number and exit.
+-.TP
++.RS 4
++Show program\*(Aqs version number and exit\&.
++.RE
++.PP
+ \fB\-h\fR, \fB\-\-help\fR
+-Show this help message and exit.
+-.TP
++.RS 4
++Show this help message and exit\&.
++.RE
++.PP
+ \fB\-\-n\fR, \fB\-\-non\-interactive\fR
+-Run non-interactive (dangerous!).
+-.TP
+-\fB\-\-o\fR \fIAPT_OPTS\fR, \fB\-\-option=\fIAPT_OPTS\fR
+-Set an APT configuration option.
+-.TP
+-\fB\-\-q\fR, \fB\-\-quiet
+-Do not show progress information.
+-.TP
++.RS 4
++Run non\-interactive (dangerous!)\&.
++.RE
++.PP
++\fB\-\-o \fR\fB\fIAPT_OPTS\fR\fR, \fB\-\-options=\fR\fB\fIAPT_OPTS\fR\fR
++.RS 4
++Set an APT configuration option\&.
++.RE
++.PP
++\fB\-\-q\fR, \fB\-\-quiet\fR
++.RS 4
++Do not show progress information\&.
++.RE
++.PP
+ \fB\-\-apt\-line\fR
+-Simulate only and print a apt-get install compatible line to stderr.
+-.TP
+-\fB\-\-root=\fIROOTDIR\fR
+-Use alternative root dir.
+-.SH EXAMPLES
+-.nf
+-.RS
+-gdebi foo_1.0_all.deb
+-gdebi foo-1.0/debian/control
++.RS 4
++Simulate only and print a apt\-get install compatible line to stderr\&.
+ .RE
++.PP
++\fB\-\-root=\fR\fB\fIROOTDIR\fR\fR
++.RS 4
++Use alternative root dir\&.
++.RE
++.SH "EXAMPLES"
++.PP
++gdebi foo_1\&.0_all\&.deb
++.PP
++gdebi foo_1\&.0/debian/control
++.SH "SEE ALSO"
++.PP
++Homepage:
++.sp
++.if n \{\
++.RS 4
++.\}
++.nf
++https://launchpad\&.net/gdebi/
+ .fi
+-.SH SEE ALSO
+-Homepage: <https://launchpad.net/gdebi/>
+-.SH AUTHOR
+-This manual page was written by Gustavo Franco <stratus@debian.org> and
+-Kartik Mistry <kartik@debian.org>, for the Debian project (but may be used by
+-others).
++.if n \{\
++.RE
++.\}
++.sp
++.SH "AUTHORS"
++.PP
++\fBGeorges Khaznadar\fR <\&georgesk@debian\&.org\&>
++.RS 4
++Rewrote this manpage for the Debian system, based on a previous manpage written by Gustavo Franco and Kartik Mistry\&.
++.RE
++.PP
++\fBGustavo Franco\fR <\&kartik@debian\&.org\&>
++.RS 4
++Wrote the first manpage\&.
++.RE
++.PP
++\fBKartik Mistry\fR <\&stratus@debian\&.org\&>
++.RS 4
++Wrote the first manpage\&.
++.RE
++.SH "COPYRIGHT"
++.br
++Copyright \(co 2020 Georges Khaznadar
++.br
++Copyright \(co 2009 Gustavo Franco and Kartik Mistry
++.br
++.PP
++This manual page was written for the Debian system (and may be used by others)\&.
++.PP
++Permission is granted to copy, distribute and/or modify this document under the terms of the GNU General Public License, Version 2 or (at your option) any later version published by the Free Software Foundation\&.
++.PP
++On Debian systems, the complete text of the GNU General Public License can be found in
++/usr/share/common\-licenses/GPL\&.
++.sp
+--- /dev/null
++++ gdebi-0.9.5.7+nmu4/data/gdebi.manpage.xml
+@@ -0,0 +1,259 @@
++<?xml version='1.0' encoding='UTF-8'?>
++<!DOCTYPE refentry PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
++"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd" [
++
++<!--
++
++`xsltproc -''-nonet \
++          -''-param man.charmap.use.subset "0" \
++          -''-param make.year.ranges "1" \
++          -''-param make.single.year.ranges "1" \
++          /usr/share/xml/docbook/stylesheet/docbook-xsl/manpages/docbook.xsl \
++          manpage.xml'
++
++A manual page <package>.<section> will be generated. You may view the
++manual page with: nroff -man <package>.<section> | less'. A typical entry
++in a Makefile or Makefile.am is:
++
++DB2MAN = /usr/share/sgml/docbook/stylesheet/xsl/docbook-xsl/manpages/docbook.xsl
++XP     = xsltproc -''-nonet -''-param man.charmap.use.subset "0"
++
++manpage.1: manpage.xml
++        $(XP) $(DB2MAN) $<
++
++The xsltproc binary is found in the xsltproc package. The XSL files are in
++docbook-xsl. A description of the parameters you can use can be found in the
++docbook-xsl-doc-* packages. Please remember that if you create the nroff
++version in one of the debian/rules file targets (such as build), you will need
++to include xsltproc and docbook-xsl in your Build-Depends control field.
++Alternatively use the xmlto command/package. That will also automatically
++pull in xsltproc and docbook-xsl.
++
++Notes for using docbook2x: docbook2x-man does not automatically create the
++AUTHOR(S) and COPYRIGHT sections. In this case, please add them manually as
++<refsect1> ... </refsect1>.
++
++To disable the automatic creation of the AUTHOR(S) and COPYRIGHT sections
++read /usr/share/doc/docbook-xsl/doc/manpages/authors.html. This file can be
++found in the docbook-xsl-doc-html package.
++
++Validation can be done using: `xmllint -''-noout -''-valid manpage.xml`
++
++General documentation about man-pages and man-page-formatting:
++man(1), man(7), http://www.tldp.org/HOWTO/Man-Page/
++
++-->
++
++  <!-- Fill in your name for FIRSTNAME and SURNAME. -->
++  <!ENTITY dhfirstname "Georges">
++  <!ENTITY dhsurname   "Khaznadar">
++  <!-- dhusername could also be set to "&dhfirstname; &dhsurname;". -->
++  <!ENTITY dhusername  "Georges Khaznadar">
++  <!ENTITY dhemail     "georgesk@debian.org">
++  <!-- SECTION should be 1-8, maybe w/ subsection other parameters are
++       allowed: see man(7), man(1) and
++       http://www.tldp.org/HOWTO/Man-Page/q2.html. -->
++  <!ENTITY dhsection   "1">
++  <!-- TITLE should be something like "User commands" or similar (see
++       http://www.tldp.org/HOWTO/Man-Page/q2.html). -->
++  <!ENTITY dhtitle     "gdebi User Manual">
++  <!ENTITY dhucpackage "GDEBI">
++  <!ENTITY dhpackage   "gdebi">
++]>
++
++<refentry>
++  <refentryinfo>
++    <title>&dhtitle;</title>
++    <productname>&dhpackage;</productname>
++    <authorgroup>
++      <author>
++       <firstname>&dhfirstname;</firstname>
++        <surname>&dhsurname;</surname>
++        <contrib>
++	  Rewrote this manpage for the Debian system, based on
++	  a previous manpage written by Gustavo Franco
++	  and Kartik Mistry.
++	</contrib>
++        <address>
++          <email>&dhemail;</email>
++        </address>
++      </author>
++      <author>
++	<firstname>Gustavo</firstname>
++	<surname>Franco</surname>
++	<contrib>Wrote the first manpage.</contrib>
++	<address><email>kartik@debian.org</email></address>
++      </author>
++      <author>
++	<firstname>Kartik</firstname>
++	<surname>Mistry</surname>
++	<contrib>Wrote the first manpage.</contrib>
++	<address><email>stratus@debian.org</email></address>
++      </author>
++    </authorgroup>
++    <copyright>
++      <year>2020</year>
++      <holder>&dhusername;</holder>
++    </copyright>
++    <copyright>
++      <year>2009</year>
++      <holder>Gustavo Franco and Kartik Mistry</holder>
++    </copyright>
++    <legalnotice>
++      <para>This manual page was written for the Debian system
++        (and may be used by others).</para>
++      <para>Permission is granted to copy, distribute and/or modify this
++        document under the terms of the GNU General Public License,
++        Version 2 or (at your option) any later version published by
++        the Free Software Foundation.</para>
++      <para>On Debian systems, the complete text of the GNU General Public
++        License can be found in
++        <filename>/usr/share/common-licenses/GPL</filename>.</para>
++    </legalnotice>
++  </refentryinfo>
++  <refmeta>
++    <refentrytitle>&dhucpackage;</refentrytitle>
++    <manvolnum>&dhsection;</manvolnum>
++  </refmeta>
++  <refnamediv>
++    <refname>&dhpackage;</refname>
++    <refpurpose>Simple tool to install deb files</refpurpose>
++  </refnamediv>
++  <refsynopsisdiv>
++    <cmdsynopsis>
++      <command>&dhpackage;</command>
++      <!-- These are several examples, how syntaxes could look -->
++      <group choice="opt">
++        <arg choice="plain"><option>--n</option></arg>
++        <arg choice="plain"><option>--non-interactive</option></arg>
++      </group>
++      <arg choice="opt">
++        <group choice="req">
++          <arg choice="plain"><option>--o <replaceable class="option">APT_OPTS</replaceable></option></arg>
++          <arg choice="plain"><option>--option=</option></arg>
++	  <replaceable class="option">APT_OPTS</replaceable>
++        </group>
++        
++      </arg>
++      <group choice="opt">
++        <arg choice="plain"><option>--q</option></arg>
++        <arg choice="plain"><option>--quiet</option></arg>
++      </group>
++      <arg choice="opt">
++        <arg choice="plain"><option>--root=<replaceable class="option">ROOTDIR</replaceable></option></arg>
++	
++      </arg>
++      <arg choice="req">
++	<option>package.deb</option>
++      </arg>
++    </cmdsynopsis>
++    <cmdsynopsis>
++      <command>&dhpackage;</command>
++      <!-- Normally the help and version options make the programs stop
++           right after outputting the requested information. -->
++      <group choice="opt">
++        <arg choice="plain">
++          <group choice="req">
++            <arg choice="plain"><option>-h</option></arg>
++            <arg choice="plain"><option>--help</option></arg>
++          </group>
++        </arg>
++        <arg choice="plain"><option>--version</option></arg>
++      </group>
++    </cmdsynopsis>
++    <cmdsynopsis>
++      <command>&dhpackage;</command>
++      <!-- Normally the help and version options make the programs stop
++           right after outputting the requested information. -->
++      <arg choice="plain"><option>--apt-line</option></arg>
++      <arg choice="req">
++	<option>package.deb</option>
++      </arg>
++    </cmdsynopsis>
++  </refsynopsisdiv>
++  <refsect1 id="description">
++    <title>DESCRIPTION</title>
++    <para>
++       <command>gdebi</command> lets you install one local deb
++       package, resolving and installing its dependencies.
++    </para>
++    <para>
++      <command>apt</command> does the same (and also for more than one
++      package on the command line), but only for remote (http, ftp) located
++      packages.
++    </para>
++    <para>
++      <command>gdebi</command> can also resolve build-depends of
++      debian/control files.
++    </para>
++  </refsect1>
++  <refsect1 id="options">
++    <title>OPTIONS</title>
++    <variablelist>
++      <!-- Use the variablelist.term.separator and the
++           variablelist.term.break.after parameters to
++           control the term elements. -->
++      <varlistentry>
++        <term><option>--version</option></term>
++        <listitem>
++          <para>Show program's version number and exit.</para>
++        </listitem>
++      </varlistentry>
++      <varlistentry>
++        <term><option>-h</option></term>
++        <term><option>--help</option></term>
++        <listitem>
++          <para>Show this help message and exit.</para>
++        </listitem>
++      </varlistentry>
++      <varlistentry>
++        <term><option>--n</option></term>
++        <term><option>--non-interactive</option></term>
++        <listitem>
++          <para>Run non-interactive (dangerous!).</para>
++        </listitem>
++      </varlistentry>
++      <varlistentry>
++        <term><option>--o <replaceable>APT_OPTS</replaceable></option></term>
++        <term><option>--options=<replaceable>APT_OPTS</replaceable></option></term>
++        <listitem>
++          <para>Set an APT configuration option.</para>
++        </listitem>
++      </varlistentry>
++      <varlistentry>
++        <term><option>--q</option></term>
++        <term><option>--quiet</option></term>
++        <listitem>
++          <para>Do not show progress information.</para>
++        </listitem>
++      </varlistentry>
++      <varlistentry>
++        <term><option>--apt-line</option></term>
++        <listitem>
++          <para>Simulate only and print a apt-get  install  compatible
++	  line to stderr.
++	  </para>
++        </listitem>
++      </varlistentry>
++      <varlistentry>
++        <term><option>--root=<replaceable>ROOTDIR</replaceable></option></term>
++        <listitem>
++          <para>Use alternative root dir.</para>
++        </listitem>
++      </varlistentry>
++    </variablelist>
++  </refsect1>
++  <refsect1 id="examples">
++    <title>EXAMPLES</title>
++    <para>gdebi foo_1.0_all.deb</para>
++    <para>gdebi foo_1.0/debian/control</para>
++  </refsect1>
++  <refsect1 id="see_also">
++    <title>SEE ALSO</title>
++    <!-- In alpabetical order. -->
++    <para>
++      Homepage: <address>https://launchpad.net/gdebi/</address>
++    </para>
++  </refsect1>
++</refentry>
++

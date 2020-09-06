@@ -1,3 +1,18 @@
+gdebi (0.9.5.7+nmu4-0.2) UNRELEASED; urgency=medium
+
+  * changed the VCS bindings to use Salsa, as there was little move on the
+    BZR repository for five years
+  * replaced recommends: libgtk2-perl by recommends: libgtk3-perl. No other
+    change was made since there is no .pl source in the package.
+  * checked that the last version gets the right password from the call to
+    gksudo. Closes: #790322
+  * rewrote the manpage for gdebi, so everybody can know that gdebi takes
+    care of only **one** file; the dependency resolution, if any, is not
+    managed by taking in account other parameters declaring deb files.
+    Closes: #798109
+
+ -- Georges Khaznadar <georgesk@debian.org>  Sun, 06 Sep 2020 12:06:34 +0200
+
 gdebi (0.9.5.7+nmu4-0.1) unstable; urgency=medium
 
   * Non-maintainer upload
