@@ -2,7 +2,8 @@ Source: gdebi
 Section: admin
 Priority: optional
 Maintainer: Ubuntu Developers <ubuntu-dev-team@lists.alioth.debian.org>
-Uploaders: Michael Vogt <mvo@debian.org>
+Uploaders: Michael Vogt <mvo@debian.org>,
+	   Georges Khaznadar <georgesk@debian.org>
 Build-Depends: debhelper-compat (=12),
                dh-python,
                gir1.2-gtk-3.0,
